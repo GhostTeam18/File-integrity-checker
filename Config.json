@@ -1,0 +1,17 @@
+{
+  "google_kms": {
+    "PROJECT_ID": "your_google_project_id",
+    "LOCATION_ID": "your_google_location_id",
+    "KEY_RING_ID": "your_google_key_ring_id"
+  },
+  "azure_kms": {
+    "VAULT_NAME": "your_azure_vault_name",
+    "CLIENT_ID": "your_azure_client_id",
+    "CLIENT_SECRET": "your_azure_client_secret"
+  },
+  "aws_kms": {
+    "LOCATION_ID": "your_aws_location_id",
+    "ACCESS_KEY": "your_aws_access_key",
+    "SECRET_KEY": "your_aws_secret_key"
+  }
+}
