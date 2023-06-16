@@ -49,40 +49,40 @@ This command will install the necessary packages for file system monitoring, key
 
 Configuration File: The File Integrity Checker requires a configuration file named config.  to store the credentials and settings for the key management services. Create a config.  file in the same directory as the script and populate it with the required information for your chosen key management service. Refer to the documentation or examples provided by the respective key management service for the required configuration details.
 
-Example config.  structure for Google Cloud KMS:
+***Example config.  structure for Google Cloud KMS:***
 
  
 
-{
+***{
   "PROJECT_ID": "your-project-id",
   "LOCATION_ID": "your-location-id",
   "KEY_RING_ID": "your-key-ring-id",
   "CLIENT_ID": "your-client-id",
   "CLIENT_SECRET": "your-client-secret"
-}
+}***
 
-Example config.  structure for Azure Key Vault:
+***Example config.  structure for Azure Key Vault:***
 
  
 
-{
+***{
   "VAULT_NAME": "your-vault-name"
-}
+}***
 
-Example config.  structure for AWS KMS:
+***Example config.  structure for AWS KMS:***
 
  
 
-{
+***{
   "LOCATION_ID": "your-location-id",
   "KEY_ID": "your-key-id",
   "CLIENT_ID": "your-client-id",
   "CLIENT_SECRET": "your-client-secret"
-}
+}***
 
-Replace the placeholder values with your actual credentials and settings.
+***Replace the placeholder values with your actual credentials and settings.***
 
-Trusted Platform Module (TPM) Support (Windows Only): If you plan to use TPM-based storage for hashes, ensure that your Windows system has TPM support enabled. The TPM functionality can be enabled in the system BIOS settings. Refer to your system's documentation or consult the manufacturer for instructions on enabling TPM.
+***Trusted Platform Module (TPM) Support (Windows Only): If you plan to use TPM-based storage for hashes, ensure that your Windows system has TPM support enabled. The TPM functionality can be enabled in the system BIOS settings. Refer to your system's documentation or consult the manufacturer for instructions on enabling TPM.***
 
 ### Installation
 
