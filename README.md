@@ -1,20 +1,11 @@
 <br/>
 <p align="center">
-  <a href="https://github.com/Ghostteam18/ File-integrity-checker">
-    <img src="https://imgur.com/a/sBNnd0U" alt="Logo" width="80" height="80">
-  </a>
-
   <h3 align="center">File Integrity Checker</h3>
 
   <p align="center">
     <a href="https://github.com/Ghostteam18/ File-integrity-checker"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
-    <a href="https://github.com/Ghostteam18/ File-integrity-checker">View Demo</a>
-    .
-    <a href="https://github.com/Ghostteam18/ File-integrity-checker/issues">Report Bug</a>
-    .
-    <a href="https://github.com/Ghostteam18/ File-integrity-checker/issues">Request Feature</a>
   </p>
 </p>
 
