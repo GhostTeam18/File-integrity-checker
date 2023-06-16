@@ -125,11 +125,11 @@ Usage: The File Integrity Checker can be run using the command-line interface. E
 
  
 
-python file_integrity_checker.py --help
+***python file_integrity_checker.py --help***
 
 Review the available options and usage examples to understand how to run the File Integrity Checker for your specific use case.
 
-Note: The installation steps provided above are for general guidance and may vary depending on your specific environment and requirements.
+***Note: The installation steps provided above are for general guidance and may vary depending on your specific environment and requirements.***
 
 ## Usage
 
@@ -141,7 +141,7 @@ The File Integrity Checker is a command-line tool that allows you to perform fil
 
     
 
-python file_integrity_checker.py <path> <hash_algorithm> <store_path> [--exclude <exclusion_list>] [--ignore_extensions <extensions_list
+***python file_integrity_checker.py <path> <hash_algorithm> <store_path> [--exclude <exclusion_list>] [--ignore_extensions <extensions_list***
 
     path>: Path to the file or directory that you want to check for integrity
     hash_algorithm>: Hashing algorithm to use for calculating file hashes. Choose from md5, sha1, or sha256
@@ -153,7 +153,7 @@ Example usage:
 
   
 
-python file_integrity_checker.py /path/to/files sha256 integrity_hashes.  --exclude /path/to/exclusions --ignore_extensions .txt,.log
+***python file_integrity_checker.py /path/to/files sha256 integrity_hashes.  --exclude /path/to/exclusions --ignore_extensions .txt,.log***
 
 This command will perform file integrity checks on the specified path using the chosen hash algorithm. The results will be stored in the integrity_hashes.  file. The optional parameters allow you to exclude specific files or directories and ignore certain file extensions.
 
@@ -165,7 +165,7 @@ The File Integrity Checker also provides functionality for encrypting and decryp
 
     
 
-python file_integrity_checker.py encrypt <file_path> <encryption_key>
+***python file_integrity_checker.py encrypt <file_path> <encryption_key>***
 
     <file_path>: Path to the file that you want to encrypt.
     <encryption_key>: Encryption key or passphrase to use for encryption.
@@ -183,8 +183,8 @@ Example usage:
 
  
 
-python file_integrity_checker.py encrypt /path/to/file.txt my_secret_key
-python file_integrity_checker.py decrypt /path/to/file.txt.enc my_secret_key
+***python file_integrity_checker.py encrypt /path/to/file.txt my_secret_key
+python file_integrity_checker.py decrypt /path/to/file.txt.enc my_secret_key***
 
 These commands will encrypt and decrypt the specified file using the provided encryption key.
 
@@ -194,7 +194,7 @@ The File Integrity Checker can monitor files for changes and perform integrity c
 
  
 
-python file_integrity_checker.py monitor <path> <hash_algorithm>
+***python file_integrity_checker.py monitor <path> <hash_algorithm>***
 
     <path>: Path to the directory to monitor for file changes.
     <hash_algorithm>: Hashing algorithm to use for calculating file hashes.
@@ -203,9 +203,9 @@ Example usage:
 
  
 
-    ***python file_integrity_checker.py monitor /path/to/files sha256***
+    python file_integrity_checker.py monitor /path/to/files sha256
 
-    ***This command will start monitoring the specified directory for file changes. Whenever a file is modified, the tool will perform an integrity check using the chosen hash algorithm.***
+    This command will start monitoring the specified directory for file changes. Whenever a file is modified, the tool will perform an integrity check using the chosen hash algorithm
 
 ***Make sure to replace the <path>, <hash_algorithm>, <store_path>, <exclusion_list>, <extensions_list>, <file_path>, and <encryption_key> with the appropriate values based on your specific use case.***
 
