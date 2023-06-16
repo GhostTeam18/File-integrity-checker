@@ -100,26 +100,22 @@ Navigate to the Directory: Change your current directory to the cloned repositor
 
  
 
-cd file-integrity-checker
+***cd file-integrity-checker***
 
-Create and Activate a Virtual Environment (Optional): It is recommended to use a virtual environment to isolate the dependencies of the File Integrity Checker. Run the following command to create a new virtual environment:
+***Create and Activate a Virtual Environment (Optional): It is recommended to use a virtual environment to isolate the dependencies of the File Integrity Checker. Run the following command to create a new virtual environment:***
 
  
 
-python -m venv env
+***python -m venv env***
 
 Activate the virtual environment:
 
-    For Windows:
-
-     
-
-env\Scripts\activate
+    For Windows:env\Scripts\activate
 
 
-Install Dependencies: With the virtual environment activated (if used), install the required Python dependencies. Run the following command:
+***Install Dependencies: With the virtual environment activated (if used), install the required Python dependencies. Run the following command:***
 
-pip install -r requirements.txt
+***pip install -r requirements.txt***
 
 This command will install all the necessary packages for the File Integrity Checker.
 
