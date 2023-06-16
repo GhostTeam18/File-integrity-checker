@@ -92,7 +92,7 @@ To install and set up the File Integrity Checker, follow these steps:
 
      
 
-***git clone (https://github.com/GhostTeam18/File-integrity-checker)***
+***git clone (https://github.com/GhostTeam18/File-integrity-checker***
 
 If you don't have Git installed, you can alternatively download the repository as a ZIP file and extract it to a local directory.
 
@@ -100,13 +100,13 @@ Navigate to the Directory: Change your current directory to the cloned repositor
 
  
 
-***cd file-integrity-checker***
+cd file-integrity-checker
 
 Create and Activate a Virtual Environment (Optional): It is recommended to use a virtual environment to isolate the dependencies of the File Integrity Checker. Run the following command to create a new virtual environment:
 
  
 
-***python -m venv env***
+python -m venv env
 
 Activate the virtual environment:
 
@@ -114,12 +114,12 @@ Activate the virtual environment:
 
      
 
-***env\Scripts\activate***
+env\Scripts\activate
 
 
 Install Dependencies: With the virtual environment activated (if used), install the required Python dependencies. Run the following command:
 
-***pip install -r requirements.txt***
+pip install -r requirements.txt
 
 This command will install all the necessary packages for the File Integrity Checker.
 
@@ -129,7 +129,7 @@ Usage: The File Integrity Checker can be run using the command-line interface. E
 
  
 
-***python file_integrity_checker.py --help***
+python file_integrity_checker.py --help
 
 Review the available options and usage examples to understand how to run the File Integrity Checker for your specific use case.
 
@@ -145,13 +145,13 @@ The File Integrity Checker is a command-line tool that allows you to perform fil
 
     
 
-***python file_integrity_checker.py <path> <hash_algorithm> <store_path> [--exclude <exclusion_list>] [--ignore_extensions <extensions_list>]***
+python file_integrity_checker.py <path> <hash_algorithm> <store_path> [--exclude <exclusion_list>] [--ignore_extensions <extensions_list
 
-    ***<path>: Path to the file or directory that you want to check for integrity.***
-    ***<hash_algorithm>: Hashing algorithm to use for calculating file hashes. Choose from md5, sha1, or sha256.***
-    ***<store_path>: Path to the   file where the calculated hashes will be stored.***
-    ***[--exclude <exclusion_list>] (optional): Comma-separated list of paths to exclude from the integrity checks.***
-    ***[--ignore_extensions <extensions_list>] (optional): Comma-separated list of file extensions to ignore during the checks.***
+    path>: Path to the file or directory that you want to check for integrity
+    hash_algorithm>: Hashing algorithm to use for calculating file hashes. Choose from md5, sha1, or sha256
+    store_path>: Path to the   file where the calculated hashes will be stored
+    exclude <exclusion_list>] (optional): Comma-separated list of paths to exclude from the integrity checks
+    ignore_extensions <extensions_list>] (optional): Comma-separated list of file extensions to ignore during the checks
 
 Example usage:
 
@@ -211,9 +211,9 @@ Example usage:
 
     This command will start monitoring the specified directory for file changes. Whenever a file is modified, the tool will perform an integrity check using the chosen hash algorithm.
 
-Make sure to replace the <path>, <hash_algorithm>, <store_path>, <exclusion_list>, <extensions_list>, <file_path>, and <encryption_key> with the appropriate values based on your specific use case.
+***Make sure to replace the <path>, <hash_algorithm>, <store_path>, <exclusion_list>, <extensions_list>, <file_path>, and <encryption_key> with the appropriate values based on your specific use case.***
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+
 
 ## Contributing
 
