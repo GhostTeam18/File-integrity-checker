@@ -3,7 +3,7 @@
   <h3 align="center">File Integrity Checker</h3>
 
   <p align="center">
-    <a href="https://github.com/Ghostteam18/ File-integrity-checker"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/Ghostteam18/File-integrity-checker"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
   </p>
