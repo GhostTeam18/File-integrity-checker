@@ -49,11 +49,11 @@ pip install watchdog google-cloud-kms azure-identity azure-keyvault-secrets boto
 
 This command will install the necessary packages for file system monitoring, key management services (Google Cloud KMS, Azure Key Vault, AWS KMS), and cryptography.
 
-Configuration File: The File Integrity Checker requires a configuration file named config.json to store the credentials and settings for the key management services. Create a config.json file in the same directory as the script and populate it with the required information for your chosen key management service. Refer to the documentation or examples provided by the respective key management service for the required configuration details.
+Configuration File: The File Integrity Checker requires a configuration file named config.  to store the credentials and settings for the key management services. Create a config.  file in the same directory as the script and populate it with the required information for your chosen key management service. Refer to the documentation or examples provided by the respective key management service for the required configuration details.
 
-Example config.json structure for Google Cloud KMS:
+Example config.  structure for Google Cloud KMS:
 
-json
+ 
 
 {
   "PROJECT_ID": "your-project-id",
@@ -63,17 +63,17 @@ json
   "CLIENT_SECRET": "your-client-secret"
 }
 
-Example config.json structure for Azure Key Vault:
+Example config.  structure for Azure Key Vault:
 
-json
+ 
 
 {
   "VAULT_NAME": "your-vault-name"
 }
 
-Example config.json structure for AWS KMS:
+Example config.  structure for AWS KMS:
 
-json
+ 
 
 {
   "LOCATION_ID": "your-location-id",
@@ -130,7 +130,7 @@ pip install -r requirements.txt
 
 This command will install all the necessary packages for the File Integrity Checker.
 
-Configure Key Management Services: Open the config.json file in a text editor and provide the required credentials and settings for your chosen key management service(s). Refer to the "Prerequisites" section for the specific structure of the config.json file.
+Configure Key Management Services: Open the config.  file in a text editor and provide the required credentials and settings for your chosen key management service(s). Refer to the "Prerequisites" section for the specific structure of the config.  file.
 
 Usage: The File Integrity Checker can be run using the command-line interface. Execute the script with the desired options and arguments to perform file integrity checks, encryption, and decryption operations. Run the following command to see the available options:
 
@@ -156,7 +156,7 @@ python file_integrity_checker.py <path> <hash_algorithm> <store_path> [--exclude
 
     <path>: Path to the file or directory that you want to check for integrity.
     <hash_algorithm>: Hashing algorithm to use for calculating file hashes. Choose from md5, sha1, or sha256.
-    <store_path>: Path to the JSON file where the calculated hashes will be stored.
+    <store_path>: Path to the   file where the calculated hashes will be stored.
     [--exclude <exclusion_list>] (optional): Comma-separated list of paths to exclude from the integrity checks.
     [--ignore_extensions <extensions_list>] (optional): Comma-separated list of file extensions to ignore during the checks.
 
@@ -164,9 +164,9 @@ Example usage:
 
 css
 
-python file_integrity_checker.py /path/to/files sha256 integrity_hashes.json --exclude /path/to/exclusions --ignore_extensions .txt,.log
+python file_integrity_checker.py /path/to/files sha256 integrity_hashes.  --exclude /path/to/exclusions --ignore_extensions .txt,.log
 
-This command will perform file integrity checks on the specified path using the chosen hash algorithm. The results will be stored in the integrity_hashes.json file. The optional parameters allow you to exclude specific files or directories and ignore certain file extensions.
+This command will perform file integrity checks on the specified path using the chosen hash algorithm. The results will be stored in the integrity_hashes.  file. The optional parameters allow you to exclude specific files or directories and ignore certain file extensions.
 
 Encryption and Decryption:
 
