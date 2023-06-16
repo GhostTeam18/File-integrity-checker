@@ -9,7 +9,7 @@
   </p>
 </p>
 
-![Downloads](https://img.shields.io/github/downloads/Ghostteam18/
+(https://img.shields.io/github/downloads/Ghostteam18/
 
 ## Table Of Contents
 
