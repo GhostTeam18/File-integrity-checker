@@ -17,10 +17,8 @@
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
 * [Usage](#usage)
-* [Contributing](#contributing)
 * [License](#license)
 * [Authors](#authors)
-* [Acknowledgements](#acknowledgements)
 
 ## About The Project
 
