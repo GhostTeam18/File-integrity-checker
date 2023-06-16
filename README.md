@@ -43,7 +43,7 @@ Python: The File Integrity Checker is written in Python, so you need to have Pyt
 
 Required Python Packages: The File Integrity Checker relies on several external Python packages. You can install these packages using the pip package manager, which is usually installed along with Python. Run the following command in your terminal or command prompt to install the required packages:
 
-sql
+
 
 pip install watchdog google-cloud-kms azure-identity azure-keyvault-secrets boto3 cryptography
 
@@ -150,7 +150,7 @@ The File Integrity Checker is a command-line tool that allows you to perform fil
 
     To perform a basic file integrity check, use the following command:
 
-    php
+    
 
 python file_integrity_checker.py <path> <hash_algorithm> <store_path> [--exclude <exclusion_list>] [--ignore_extensions <extensions_list>]
 
@@ -174,7 +174,7 @@ The File Integrity Checker also provides functionality for encrypting and decryp
 
     Encrypt a file:
 
-    php
+    
 
 python file_integrity_checker.py encrypt <file_path> <encryption_key>
 
@@ -183,7 +183,7 @@ python file_integrity_checker.py encrypt <file_path> <encryption_key>
 
 Decrypt a file:
 
-php
+
 
     python file_integrity_checker.py decrypt <file_path> <encryption_key>
 
@@ -203,7 +203,7 @@ Monitoring for File Changes:
 
 The File Integrity Checker can monitor files for changes and perform integrity checks whenever a modification occurs. To enable file monitoring, use the following command:
 
-php
+ 
 
 python file_integrity_checker.py monitor <path> <hash_algorithm>
 
