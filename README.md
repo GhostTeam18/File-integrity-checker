@@ -227,4 +227,4 @@ Distributed under the MIT License. See [LICENSE](https://github.com/Ghostteam18/
 
 ## Authors
 
-* **GhostTeam18** - *Just a someone trying to learn* - [GhostTeam18](https://github.com/GhostTeam18/) - **
+* **GhostTeam18** - *Just a someone trying to learn* - [GhostTeam18](https://github.com/GhostTeam18/) - 
