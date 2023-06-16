@@ -112,8 +112,8 @@ License
 This project is licensed under the MIT License. See the LICENSE file for details.
 Contributing
 
-Contributions are welcome! Please refer to the Contribution Guidelines for more information.
+Contributions are welcome!
 Acknowledgments
 
-    The File Integrity Checker script was inspired by the need for a reliable and efficient way to perform file integrity checks in various environments.
+    The File Integrity Checker script was inspired by the need for a reliable and efficient way to perform file integrity checks in various environments. I also just wanted to try my hand at it :)
     Special thanks to the authors and contributors of the libraries and frameworks used in this project.
