@@ -9,7 +9,7 @@
   </p>
 </p>
 
-![Downloads](https://img.shields.io/github/downloads/Ghostteam18/ File-integrity-checker/total) ![Contributors](https://img.shields.io/github/contributors/Ghostteam18/ File-integrity-checker?color=dark-green) ![Issues](https://img.shields.io/github/issues/Ghostteam18/ File-integrity-checker) ![License](https://img.shields.io/github/license/Ghostteam18/ File-integrity-checker) 
+![Downloads](https://img.shields.io/github/downloads/Ghostteam18/
 
 ## Table Of Contents
 
