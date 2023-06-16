@@ -92,7 +92,7 @@ To install and set up the File Integrity Checker, follow these steps:
 
     Clone the Repository: Start by cloning the repository to your local machine. Open a terminal or command prompt and run the following command:
 
-    bash
+     
 
 git clone <repository-url>
 
@@ -100,13 +100,13 @@ Replace <repository-url> with the URL of the repository you want to clone. If yo
 
 Navigate to the Directory: Change your current directory to the cloned repository directory:
 
-bash
+ 
 
 cd file-integrity-checker
 
 Create and Activate a Virtual Environment (Optional): It is recommended to use a virtual environment to isolate the dependencies of the File Integrity Checker. Run the following command to create a new virtual environment:
 
-bash
+ 
 
 python -m venv env
 
@@ -114,13 +114,13 @@ Activate the virtual environment:
 
     For Windows:
 
-    bash
+     
 
 env\Scripts\activate
 
 For macOS and Linux:
 
-bash
+ 
 
     source env/bin/activate
 
@@ -134,7 +134,7 @@ Configure Key Management Services: Open the config.  file in a text editor and p
 
 Usage: The File Integrity Checker can be run using the command-line interface. Execute the script with the desired options and arguments to perform file integrity checks, encryption, and decryption operations. Run the following command to see the available options:
 
-bash
+ 
 
 python file_integrity_checker.py --help
 
@@ -162,7 +162,7 @@ python file_integrity_checker.py <path> <hash_algorithm> <store_path> [--exclude
 
 Example usage:
 
-css
+  
 
 python file_integrity_checker.py /path/to/files sha256 integrity_hashes.  --exclude /path/to/exclusions --ignore_extensions .txt,.log
 
@@ -192,7 +192,7 @@ Decrypt a file:
 
 Example usage:
 
-bash
+ 
 
 python file_integrity_checker.py encrypt /path/to/file.txt my_secret_key
 python file_integrity_checker.py decrypt /path/to/file.txt.enc my_secret_key
@@ -212,7 +212,7 @@ python file_integrity_checker.py monitor <path> <hash_algorithm>
 
 Example usage:
 
-bash
+ 
 
     python file_integrity_checker.py monitor /path/to/files sha256
 
@@ -241,9 +241,3 @@ Distributed under the MIT License. See [LICENSE](https://github.com/Ghostteam18/
 ## Authors
 
 * **GhostTeam18** - *Just a someone trying to learn* - [GhostTeam18](https://github.com/GhostTeam18/) - **
-
-## Acknowledgements
-
-* []()
-* []()
-* []()
