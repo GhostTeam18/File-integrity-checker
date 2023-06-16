@@ -207,9 +207,9 @@ Example usage:
 
  
 
-    python file_integrity_checker.py monitor /path/to/files sha256
+    ***python file_integrity_checker.py monitor /path/to/files sha256***
 
-    This command will start monitoring the specified directory for file changes. Whenever a file is modified, the tool will perform an integrity check using the chosen hash algorithm.
+    ***This command will start monitoring the specified directory for file changes. Whenever a file is modified, the tool will perform an integrity check using the chosen hash algorithm.***
 
 ***Make sure to replace the <path>, <hash_algorithm>, <store_path>, <exclusion_list>, <extensions_list>, <file_path>, and <encryption_key> with the appropriate values based on your specific use case.***
 
