@@ -9,8 +9,6 @@
   </p>
 </p>
 
-(https://img.shields.io/github/downloads/Ghostteam18/
-
 ## Table Of Contents
 
 * [About the Project](#about-the-project)
