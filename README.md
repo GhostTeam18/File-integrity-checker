@@ -16,7 +16,7 @@ Installation
 
     shell
 
-git clone https://github.com/your-username/file-integrity-checker.git
+git clone https://github.com/GhostTeam18/file-integrity-checker.git
 cd file-integrity-checker
 
 Install the required dependencies:
