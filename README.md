@@ -92,7 +92,7 @@ To install and set up the File Integrity Checker, follow these steps:
 
      
 
-***git clone (https://github.com/GhostTeam18/File-integrity-checker***
+***git clone https://github.com/GhostTeam18/File-integrity-checker***
 
 If you don't have Git installed, you can alternatively download the repository as a ZIP file and extract it to a local directory.
 
