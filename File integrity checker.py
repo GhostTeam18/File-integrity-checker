@@ -1,4 +1,3 @@
-import argparse
 import logging
 import threading
 import concurrent.futures
@@ -20,6 +19,7 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import boto3
 from botocore.exceptions import NoCredentialsError
+import argparse
 
 # Configure logging
 logging.basicConfig(filename='file_integrity.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -232,10 +232,10 @@ class FileIntegrityChecker:
         except Exception as e:
             logger.exception(f"Error performing integrity check for file '{file_path}': {e}")
 
-    def get_files_in_directory(self, directory):
+    def get_files_in_directory(self, directory, excluded_filetypes=None):
         file_paths = []
         for file in Path(directory).rglob("*"):
-            if file.is_file():
+            if file.is_file() and (excluded_filetypes is None or not any(file.suffix == ft for ft in excluded_filetypes)):
                 file_paths.append(str(file))
         return file_paths
 
@@ -545,41 +545,41 @@ class FileIntegrityChecker:
         except Exception as e:
             logger.exception("Failed to decrypt the file using AWS KMS: %s", str(e))
 
-    def run(self, input_path, hash_algorithm, exclude_list_file, store_hashes_file, tpm_enabled):
-        try:
-            self.validate_input_path(input_path)
-            self.validate_file_path(exclude_list_file)
-            self.validate_file_path(store_hashes_file)
+def run(self, input_path, hash_algorithm, exclude_list_file, store_hashes_file, tpm_enabled, excluded_filetypes=None):
+    try:
+        self.validate_input_path(input_path)
+        self.validate_file_path(exclude_list_file)
+        self.validate_file_path(store_hashes_file)
 
-            # Load the exclusion list
-            exclusion_list = self.load_exclusion_list(exclude_list_file)
+        # Load the exclusion list
+        exclusion_list = self.load_exclusion_list(exclude_list_file)
 
-            # Load the stored hashes
-            self.load_stored_hashes(store_hashes_file)
+        # Load the stored hashes
+        self.load_stored_hashes(store_hashes_file)
 
-            # Get the file paths
-            if os.path.isfile(input_path):
-                file_paths = [input_path]
-            else:
-                file_paths = self.get_files_in_directory(input_path)
+        # Get the file paths
+        if os.path.isfile(input_path):
+            file_paths = [input_path]
+        else:
+            file_paths = self.get_files_in_directory(input_path, excluded_filetypes)
 
-            # Exclude files from the results
-            file_paths = self.exclude_files_from_results(file_paths, exclusion_list)
+        # Exclude files from the results
+        file_paths = self.exclude_files_from_results(file_paths, exclusion_list)
 
-            # Perform integrity checks
-            self.parallel_integrity_checks(file_paths, hash_algorithm)
+        # Perform integrity checks
+        self.parallel_integrity_checks(file_paths, hash_algorithm)
 
-            # Store hashes in TPM if enabled
-            if tpm_enabled:
-                tpm = self.initialize_tpm()
-                if tpm is not None:
-                    self.store_hashes_in_tpm(tpm, self.stored_hashes)
+        # Store hashes in TPM if enabled
+        if tpm_enabled:
+            tpm = self.initialize_tpm()
+            if tpm is not None:
+                self.store_hashes_in_tpm(tpm, self.stored_hashes)
 
-            # Save the stored hashes
-            self.save_stored_hashes(store_hashes_file)
+        # Save the stored hashes
+        self.save_stored_hashes(store_hashes_file)
 
-        except Exception as e:
-            logger.exception("An error occurred: %s", str(e))
+    except Exception as e:
+        logger.exception("An error occurred: %s", str(e))
 
 
 class FileChangeEventHandler(FileSystemEventHandler):
@@ -674,5 +674,20 @@ def main():
     file_path_to_decrypt = 'path/to/file.txt.enc'
     file_integrity_checker.decrypt_file(file_path_to_decrypt, encryption_key)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='File integrity checker.')
+    parser.add_argument('path', help='Path to the file or directory.')
+    parser.add_argument('hash_algorithm', help='Hashing algorithm to use.')
+    parser.add_argument('store_path', help='Path to the JSON file to store the hashes.')
+    parser.add_argument('--exclude', help='Comma-separated list of paths to exclude.')
+    parser.add_argument('--ignore_extensions', help='Comma-separated list of file extensions to ignore.')
+    args = parser.parse_args()
+    if args.ignore_extensions:
+        args.ignore_extensions = args.ignore_extensions.split(',')
+    return args
+
+
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    checker = FileIntegrityChecker()
+    checker.run(args.path, args.hash_algorithm, args.exclude, args.store_path, tpm_enabled=False)
