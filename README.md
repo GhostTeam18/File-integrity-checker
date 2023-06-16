@@ -28,7 +28,7 @@ The File Integrity Checker is a Python script that allows you to perform file in
 
 ## Built With
 
-** Python! google-cloud-kms! azure-identity, azure-keyvault-secrets!** 
+**Python! google-cloud-kms! azure-identity, azure-keyvault-secrets!** 
 
 ## Getting Started
 
