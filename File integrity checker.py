@@ -4,6 +4,7 @@ import concurrent.futures
 import datetime
 import ctypes
 import os
+import sys
 from pathlib import Path
 import json
 import hashlib
@@ -15,11 +16,16 @@ from cryptography.hazmat.primitives import hashes, padding, serialization
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from google.cloud import kms as google_kms
+from PyQt6.QtWidgets import QApplication
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import boto3
 from botocore.exceptions import NoCredentialsError
 import argparse
+from concurrent.futures import ThreadPoolExecutor
+from gui import MainWindow
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Configure logging
 logging.basicConfig(filename='file_integrity.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -30,7 +36,9 @@ class FileIntegrityChecker:
     SUPPORTED_HASH_ALGORITHMS = {
         'md5': hashlib.md5,
         'sha1': hashlib.sha1,
-        'sha256': hashlib.sha256
+        'sha256': hashlib.sha256,
+        'sha512': hashlib.sha512,
+        'sha384': hashlib.sha384,
     }
     CHUNK_SIZE = 4096
     IV_SIZE = 16
@@ -42,6 +50,74 @@ class FileIntegrityChecker:
         self.google_kms_client = google_kms_client
         self.azure_kms_client = azure_kms_client
         self.aws_kms_client = aws_kms_client
+        self.kms = None
+        self.tpm = None
+        self.config = None
+        self.kms_key_id = None
+
+    def run(self, args):
+        self.process_files(args.path, args.hash_algorithm, args.exclude, args.store_path, args.threads)
+        self.config = args
+        self.kms = args.kms
+        self.kms_key_id = args.key_id
+
+        if args.encrypt:
+            self.encrypt_file(args.encrypt, self.get_encryption_key())
+        elif args.decrypt:
+            self.decrypt_file(args.decrypt, self.get_encryption_key())
+        else:
+            self.process_files(args.path, args.hash_algorithm, args.exclude, args.store_path, args.threads)
+
+    def process_files(self, path, hash_algorithm, exclude, store_path, threads):
+        def calculate_hash(file_path, hash_algorithm):
+            hash_func = getattr(hashlib, hash_algorithm)()
+            with open(file_path, 'rb') as file:
+                while chunk := file.read(4096):
+                    hash_func.update(chunk)
+            return hash_func.hexdigest()
+
+        def process_file(file_path, hash_algorithm, store_path):
+            if exclude and file_path in exclude:
+                return
+            file_hash = calculate_hash(file_path, hash_algorithm)
+            self.integrity_results.append({'file': file_path, 'hash': file_hash})
+            print(f"File: {file_path}, Hash: {file_hash}")
+
+        with ThreadPoolExecutor(max_workers=threads) as executor:
+            for root, dirs, files in os.walk(path):
+                for file_name in files:
+                    file_path = os.path.join(root, file_name)
+                    # Submit the processing of each file to a thread pool
+                    executor.submit(process_file, file_path, hash_algorithm, store_path)
+
+        # Saving results to a file or database as needed
+        with open(store_path, 'w') as file:
+            file.write('\n'.join([f"{result['file']} {result['hash']}" for result in self.integrity_results]))
+
+        print(f"Integrity results stored in {store_path}")
+        
+    def check_integrity(self, path, hash_algorithm, store_path):
+        # Read the stored hashes
+        with open(store_path, 'r') as file:
+            stored_hashes = json.load(file)
+
+        # Recalculate the hashes for the files
+        integrity_results = []
+        for root, dirs, files in os.walk(path):
+            for file_name in files:
+                file_path = os.path.join(root, file_name)
+                file_hash = self.calculate_hash(file_path, hash_algorithm)
+                integrity_results.append({'file': file_path, 'hash': file_hash})
+
+        # Compare the recalculated hashes with the stored hashes
+        for result in integrity_results:
+            file_path = result['file']
+            calculated_hash = result['hash']
+            stored_hash = stored_hashes.get(file_path)
+            if stored_hash != calculated_hash:
+                print(f"Integrity check failed for file: {file_path}")
+            else:
+                print(f"Integrity check passed for file: {file_path}")
 
 
     def calculate_file_hash(self, file_path, hash_algorithm):
@@ -545,41 +621,28 @@ class FileIntegrityChecker:
         except Exception as e:
             logger.exception("Failed to decrypt the file using AWS KMS: %s", str(e))
 
-def run(self, input_path, hash_algorithm, exclude_list_file, store_hashes_file, tpm_enabled, excluded_filetypes=None):
+def run(self, args):
     try:
-        self.validate_input_path(input_path)
-        self.validate_file_path(exclude_list_file)
-        self.validate_file_path(store_hashes_file)
+        path = args.path
+        hash_algorithm = args.hash_algorithm
+        exclude = args.exclude
+        store_path = args.store_path
+        threads = args.threads
 
-        # Load the exclusion list
-        exclusion_list = self.load_exclusion_list(exclude_list_file)
+        logging.info(f"Starting operation on {path} with {hash_algorithm}")
 
-        # Load the stored hashes
-        self.load_stored_hashes(store_hashes_file)
-
-        # Get the file paths
-        if os.path.isfile(input_path):
-            file_paths = [input_path]
+        if args.encrypt:
+            self.encrypt_file(path, args.key_id)
+        elif args.decrypt:
+            self.decrypt_file(path, args.key_id)
         else:
-            file_paths = self.get_files_in_directory(input_path, excluded_filetypes)
+            self.check_integrity(path, hash_algorithm, exclude, store_path, threads)
 
-        # Exclude files from the results
-        file_paths = self.exclude_files_from_results(file_paths, exclusion_list)
-
-        # Perform integrity checks
-        self.parallel_integrity_checks(file_paths, hash_algorithm)
-
-        # Store hashes in TPM if enabled
-        if tpm_enabled:
-            tpm = self.initialize_tpm()
-            if tpm is not None:
-                self.store_hashes_in_tpm(tpm, self.stored_hashes)
-
-        # Save the stored hashes
-        self.save_stored_hashes(store_hashes_file)
+        logging.info("Operation completed successfully")
 
     except Exception as e:
-        logger.exception("An error occurred: %s", str(e))
+        logging.error(f"An error occurred: {str(e)}")
+
 
 
 class FileChangeEventHandler(FileSystemEventHandler):
@@ -587,9 +650,6 @@ class FileChangeEventHandler(FileSystemEventHandler):
         super().__init__()
         self.file_paths = file_paths
         self.hash_algorithm = hash_algorithm
-        self.google_kms_client = google_kms_client
-        self.azure_kms_client = azure_kms_client
-        self.aws_kms_client = aws_kms_client
 
     def on_modified(self, event):
         if event.is_directory:
@@ -675,12 +735,16 @@ def main():
     file_integrity_checker.decrypt_file(file_path_to_decrypt, encryption_key)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='File integrity checker.')
-    parser.add_argument('path', help='Path to the file or directory.')
-    parser.add_argument('hash_algorithm', help='Hashing algorithm to use.')
-    parser.add_argument('store_path', help='Path to the JSON file to store the hashes.')
-    parser.add_argument('--exclude', help='Comma-separated list of paths to exclude.')
-    parser.add_argument('--ignore_extensions', help='Comma-separated list of file extensions to ignore.')
+    parser = argparse.ArgumentParser(description="File integrity checker")
+    parser.add_argument("--exclude", type=str, help="Comma-separated list of directories or files to exclude")
+    parser.add_argument("--ignore_extensions", type=str, help="Comma-separated list of file extensions to ignore")
+    parser.add_argument("--threads", type=int, default=1, help="Number of threads to use")
+    parser.add_argument("--tpm", action="store_true", help="Enable TPM key management (if available)")
+    parser.add_argument("--gui", action="store_true", help="Launch the graphical user interface")
+    parser.add_argument("path", nargs='?', type=str, help="Path to the directory or file to check")
+    parser.add_argument("hash_algorithm", nargs='?', choices=FileIntegrityChecker.SUPPORTED_HASH_ALGORITHMS, help="Hash algorithm to use")
+    parser.add_argument("store_path", nargs='?', type=str, help="Path to store the hash values")
+    
     args = parser.parse_args()
     if args.ignore_extensions:
         args.ignore_extensions = args.ignore_extensions.split(',')
@@ -689,5 +753,17 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    checker = FileIntegrityChecker()
-    checker.run(args.path, args.hash_algorithm, args.exclude, args.store_path, tpm_enabled=False)
+
+    if args.gui:
+        app = QApplication(sys.argv)
+        window = MainWindow()
+        window.show()
+        sys.exit(app.exec())  # Note the change here from exec_() to exec()
+    else:
+        # Make sure required arguments are present when not using GUI
+        if args.path is None or args.hash_algorithm is None or args.store_path is None:
+            print("Error: path, hash_algorithm, and store_path are required when not using GUI.")
+            sys.exit(1)
+
+        checker = FileIntegrityChecker()
+        checker.run(args)
