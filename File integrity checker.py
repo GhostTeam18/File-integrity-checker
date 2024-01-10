@@ -9,6 +9,7 @@ from pathlib import Path
 import json
 import hashlib
 import time
+import requests
 import base64
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -24,6 +25,11 @@ from botocore.exceptions import NoCredentialsError
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 from gui import MainWindow
+from typing import Optional, Dict, Any
+import boto3
+from google.cloud import storage
+
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -33,6 +39,7 @@ logger = logging.getLogger(__name__)
 
 
 class FileIntegrityChecker:
+
     SUPPORTED_HASH_ALGORITHMS = {
         'md5': hashlib.md5,
         'sha1': hashlib.sha1,
@@ -43,17 +50,70 @@ class FileIntegrityChecker:
     CHUNK_SIZE = 4096
     IV_SIZE = 16
 
-    def __init__(self, google_kms_client=None, azure_kms_client=None, aws_kms_client=None):
+    def __init__(self, kms_clients: Optional[Dict[str, Any]] = None):
         self.integrity_results = []
         self.stored_hashes = {}
         self.lock = threading.Lock()
-        self.google_kms_client = google_kms_client
-        self.azure_kms_client = azure_kms_client
-        self.aws_kms_client = aws_kms_client
-        self.kms = None
-        self.tpm = None
-        self.config = None
-        self.kms_key_id = None
+        
+        # Initialize KMS clients dictionary
+        self._kms_clients = kms_clients or {}
+        
+        # This will store our active KMS client once it's lazily initialized
+        self._active_kms_client = None
+
+        self.excluded_files = set()
+        self.ignore_extensions = []
+
+        # Attributes for cloud storage integration
+        self.cloud_storage_clients = {}
+        self.active_cloud_storage_client = None
+
+
+    def _get_kms_client(self, provider: str):
+        """Lazily get or initialize the appropriate KMS client."""
+        if not self._active_kms_client:
+            self._active_kms_client = self._kms_clients.get(provider)
+            if not self._active_kms_client:
+                raise ValueError(f"KMS client for provider {provider} not found.")
+        return self._active_kms_client
+
+    def get_s3_object(self, bucket, key):
+        s3 = boto3.client('s3', **self.aws_config)
+        return s3.get_object(Bucket=bucket, Key=key)['Body'].read()
+
+    def get_gcs_object(self, bucket_name, blob_name):
+        storage_client = storage.Client(**self.gcs_config)
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        return blob.download_as_bytes()
+
+    def get_onedrive_file(self, file_id):
+        headers = {
+            "Authorization": f"Bearer {self.onedrive_token}"
+        }
+        response = requests.get(f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content", headers=headers)
+        response.raise_for_status()
+        return response.content
+
+    def is_cloud_path(self, path):
+        """Determine if the path is for cloud storage."""
+
+        return path.startswith(("aws:", "gcs:", "onedrive:"))
+
+    def fetch_file_data(self, path):
+        """Fetch file data based on its location (local or cloud)."""
+        if not self.is_cloud_path(path):
+            with open(path, 'rb') as f:
+                return f.read()
+        else:
+            # Fetch from cloud
+            cloud_prefix = path.split(":")[0]
+            if cloud_prefix == 'aws':
+                # Assuming 'path' is in format: 'aws:bucket_name:object_key'
+                _, bucket_name, object_key = path.split(":")
+                obj = self.cloud_storage_clients['aws'].get_object(Bucket=bucket_name, Key=object_key)
+                return obj['Body'].read()
+
 
     def run(self, args):
         self.process_files(args.path, args.hash_algorithm, args.exclude, args.store_path, args.threads)
@@ -735,16 +795,21 @@ def main():
     file_integrity_checker.decrypt_file(file_path_to_decrypt, encryption_key)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="File integrity checker")
-    parser.add_argument("--exclude", type=str, help="Comma-separated list of directories or files to exclude")
-    parser.add_argument("--ignore_extensions", type=str, help="Comma-separated list of file extensions to ignore")
-    parser.add_argument("--threads", type=int, default=1, help="Number of threads to use")
-    parser.add_argument("--tpm", action="store_true", help="Enable TPM key management (if available)")
-    parser.add_argument("--gui", action="store_true", help="Launch the graphical user interface")
-    parser.add_argument("path", nargs='?', type=str, help="Path to the directory or file to check")
-    parser.add_argument("hash_algorithm", nargs='?', choices=FileIntegrityChecker.SUPPORTED_HASH_ALGORITHMS, help="Hash algorithm to use")
-    parser.add_argument("store_path", nargs='?', type=str, help="Path to store the hash values")
+    parser = argparse.ArgumentParser(description="File Integrity Checker")
+
+    parser.add_argument('path', nargs='?', help="Directory path to be checked.")
+    parser.add_argument('hash_algorithm', choices=FileIntegrityChecker.SUPPORTED_HASH_ALGORITHMS, nargs='?', help="Hash algorithm to use.")
+    parser.add_argument('store_path', nargs='?', help="Where to store the results.")
+    parser.add_argument('--exclude', type=str, help="File patterns to exclude. Comma separated.")
+    parser.add_argument('--ignore_extensions', type=str, help="File extensions to ignore. Comma separated.")
+    parser.add_argument('--threads', type=int, default=4, help="Number of threads to use.")
+    parser.add_argument('--tpm', action="store_true", help="Use TPM for encryption.")
+    parser.add_argument('--gui', action="store_true", help="Use GUI mode.")
     
+    # Cloud-related arguments
+    parser.add_argument('--cloud', choices=['aws_s3', 'gcp', 'onedrive'], help="Specify the cloud provider.")
+    parser.add_argument('--token', type=str, help="Authentication token or key for cloud service.")
+
     args = parser.parse_args()
     if args.ignore_extensions:
         args.ignore_extensions = args.ignore_extensions.split(',')
@@ -753,17 +818,16 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+    checker = FileIntegrityChecker()
 
     if args.gui:
         app = QApplication(sys.argv)
-        window = MainWindow()
+        window = MainWindow(checker, args)
         window.show()
-        sys.exit(app.exec())  # Note the change here from exec_() to exec()
+        sys.exit(app.exec())
     else:
         # Make sure required arguments are present when not using GUI
         if args.path is None or args.hash_algorithm is None or args.store_path is None:
             print("Error: path, hash_algorithm, and store_path are required when not using GUI.")
             sys.exit(1)
-
-        checker = FileIntegrityChecker()
         checker.run(args)
