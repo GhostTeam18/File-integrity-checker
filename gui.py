@@ -4,10 +4,6 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QGridLayout,
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
-
-
-
-
 class MainWindow(QMainWindow):
     def __init__(self, checker, args):
         super().__init__()

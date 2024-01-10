@@ -29,14 +29,11 @@ from typing import Optional, Dict, Any
 import boto3
 from google.cloud import storage
 
-
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Configure logging
 logging.basicConfig(filename='file_integrity.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 
 class FileIntegrityChecker:
 
@@ -681,54 +678,52 @@ class FileIntegrityChecker:
         except Exception as e:
             logger.exception("Failed to decrypt the file using AWS KMS: %s", str(e))
 
-def run(self, args):
-    try:
-        path = args.path
-        hash_algorithm = args.hash_algorithm
-        exclude = args.exclude
-        store_path = args.store_path
-        threads = args.threads
+def run(self, args): # Handle program execution
+   try:
+       path = args.path  # Get file path
+       hash_alg = args.hash_algorithm  # Get hash algorithm
+       exclude = args.exclude  # Get exclude option
+       store_path = argsstore_path  # Get store path
+       threads = args.threads  # Get number of threads
 
-        logging.info(f"Starting operation on {path} with {hash_algorithm}")
+       logging.info(f"Starting operation on {path} with {hash_alg}")  # Log start of operation
 
-        if args.encrypt:
-            self.encrypt_file(path, args.key_id)
-        elif args.decrypt:
-            self.decrypt_file(path, args.key_id)
-        else:
-            self.check_integrity(path, hash_algorithm, exclude, store_path, threads)
+       if args.encrypt:  # If encrypt option is set
+           self.encrypt_file(path, args.key_id)  # Encrypt file
+       elif args.decrypt:  # If decrypt option is set
+           self.decrypt_file(path, args.key_id)  # Decrypt file
+       else:  # If neither encrypt nor decrypt option is set
+           self.check_integrity(path, hash_alg, exclude, store_path, threads)  # Check file integrity
 
-        logging.info("Operation completed successfully")
+       logging.info("Operation completed successfully")  # Log successful completion
 
-    except Exception as e:
-        logging.error(f"An error occurred: {str(e)}")
+   except Exception as e:  # Catch any exception
+       logging.error(f"An error occurred: {str(e)}")  # Log error message
 
+class FileChangeEventHandler(SystemEventHandler):    # Handles file change events
+   def __init__(self file_paths,_algorithm, google_kms_client=None, azure_kms_client=None,_kms_client=None):
+       super().__init__()
+       self.file_paths = file_paths  # Files to monitor
+       self.hash_algorithm = hash_algorithm  # Hash algorithm for integrity check
 
-
-class FileChangeEventHandler(FileSystemEventHandler):
-    def __init__(self, file_paths, hash_algorithm, google_kms_client=None, azure_kms_client=None, aws_kms_client=None):
-        super().__init__()
-        self.file_paths = file_paths
-        self.hash_algorithm = hash_algorithm
-
-    def on_modified(self, event):
-        if event.is_directory:
-            return
-        file_path = event.src_path
-        if file_path in self.file_paths:
-            file_integrity_checker = FileIntegrityChecker(
-                self.google_kms_client,
-                self.azure_kms_client,
-                self.aws_kms_client
-            )
-            # Check if any of the KMS clients are initialized
-            if (
-                self.google_kms_client is None
-                and self.azure_kms_client is None
-                and self.aws_kms_client is None
-            ):
-                print("Warning: No KMS clients initialized. Integrity check will be performed without encryption.")
-            file_integrity_checker.perform_integrity_check(file_path, self.hash_algorithm)
+   def on_modified(self, event):    # Called when a file is modified
+       if event.is_directory:    # Ignore directories
+           return
+       file_path = event.src_path
+       if file_path in self.file_paths:
+           file_integrity_checker = FileIntegrityChecker(   # Create integrity checker
+               self.google_kms_client,
+               self.azure_kms_client,
+               self.aws_kms_client
+           )
+           # Check if any KMS clients are initialized
+           if not any([   # Warn if no KMS clients are initialized
+               self.google_kms_client,
+               self.azure_kms_client,
+               self.aws_kms_client
+           ]):
+               print("Warning: No KMS clients initialized")
+           file_integrity_checker.perform_integrity_check(file_path, self.hash_algorithm)
 
 def main():
     parser = argparse.ArgumentParser(description="File Integrity Checker")
